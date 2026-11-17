@@ -91,6 +91,16 @@
 	$: touchpointRowIndex = device.rows + (device.encoders > 0 ? 1 : 0);
 	$: keypadRowWidth = device.columns * 132;
 
+	// Scale the whole grid down to fit the available area (high-DPI / small windows).
+	let containerWidth = 0;
+	let containerHeight = 0;
+	$: naturalWidth = keypadRowWidth;
+	$: naturalHeight = gridRowLengths.length * 132;
+	$: fit =
+		containerWidth > 0 && containerHeight > 0
+			? Math.max(0.1, Math.min(1, (containerWidth - 32) / naturalWidth, (containerHeight - 48) / naturalHeight))
+			: 1;
+
 	function flatIndexFromRowCol(row: number, col: number): number {
 		let index = 0;
 		for (let r = 0; r < row; r++) index += gridRowLengths[r];
@@ -162,7 +172,7 @@
 {#key device}
 	<span id="grid-description" class="sr-only">{$t("device_view.grid_description")}</span>
 	<div
-		class="flex flex-col justify-center grow px-16 py-6 overflow-auto"
+		class="flex flex-col justify-center grow min-h-0 min-w-0 px-4 py-6 overflow-auto"
 		class:items-center={device.columns <= 9}
 		class:hidden={$inspectedParentAction || selectedDevice != device.id}
 		class:device-fade-x={overflowsX && !overflowsY}
@@ -172,11 +182,15 @@
 		aria-label={device.name}
 		aria-describedby="grid-description"
 		tabindex="-1"
+		bind:clientWidth={containerWidth}
+		bind:clientHeight={containerHeight}
 		on:click={() => inspectedInstance.set(null)}
 		on:keyup={() => inspectedInstance.set(null)}
 		on:keydown|capture={handleGridKeydown}
 		on:focusin={handleGridFocusin}
 	>
+		<div class="shrink-0 overflow-hidden" style={`width: ${naturalWidth * fit}px; height: ${naturalHeight * fit}px;`}>
+		<div style={`width: ${naturalWidth}px; transform: scale(${fit}); transform-origin: top left;`}>
 		<div class="flex flex-col" role="rowgroup">
 			{#each { length: device.rows } as _, r}
 				<div class="flex flex-row" role="row">
@@ -246,6 +260,8 @@
 					tabindex={focusedRow === touchpointRowIndex && focusedCol === i ? 0 : -1}
 				/>
 			{/each}
+		</div>
+		</div>
 		</div>
 	</div>
 {/key}

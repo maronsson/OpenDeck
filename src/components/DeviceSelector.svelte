@@ -3,7 +3,7 @@
 	import type { Profile } from "$lib/Profile";
 
 	import { t } from "$lib/i18n";
-	import { profileManager } from "$lib/singletons";
+	import { halfSize, profileManager } from "$lib/singletons";
 
 	import { invoke } from "@tauri-apps/api/core";
 	import { listen } from "@tauri-apps/api/event";
@@ -54,10 +54,12 @@
 			const effectiveRows = Math.min(devices[value].rows + Math.min(devices[value].encoders, 1) + Math.min(devices[value].touchpoints, 1), 4);
 			const idealWidth = effectiveCols * 132 + 416;
 			const idealHeight = effectiveRows * 132 + 384 + (buildInfo?.split("</summary>")[0]?.includes("darwin") ? 28 : 0);
+			const factor = $halfSize ? 0.5 : 1;
 			(async () => {
-				const width = Math.min(idealWidth, screen.availWidth);
-				const height = Math.min(idealHeight, screen.availHeight);
-				await window.setMinSize(new LogicalSize(width, height));
+				const width = Math.min(idealWidth, screen.availWidth) * factor;
+				const height = Math.min(idealHeight, screen.availHeight) * factor;
+				// Never lock the window to the ideal size; the layout scales to fit.
+				await window.setMinSize(new LogicalSize(360, 300));
 				await window.setSize(new LogicalSize(width, height));
 			})();
 		}

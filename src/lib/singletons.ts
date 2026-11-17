@@ -10,3 +10,4 @@ import type ProfileManager from "../components/ProfileManager.svelte";
 export const actionList: Writable<ActionList | null> = writable(null);
 export const deviceSelector: Writable<DeviceSelector | null> = writable(null);
 export const profileManager: Writable<ProfileManager | null> = writable(null);
+export const halfSize: Writable<boolean> = writable(false);

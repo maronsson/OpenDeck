@@ -4,7 +4,7 @@
 
 	import { initPortBase } from "$lib/ports";
 	import { inspectedParentAction } from "$lib/propertyInspector";
-	import { actionList, deviceSelector, profileManager } from "$lib/singletons";
+	import { actionList, deviceSelector, halfSize, profileManager } from "$lib/singletons";
 
 	import ActionList from "../components/ActionList.svelte";
 	import DeviceSelector from "../components/DeviceSelector.svelte";
@@ -25,9 +25,9 @@
 
 <svelte:window on:dragover={(event) => event.preventDefault()} on:drop={(event) => event.preventDefault()} />
 
-<div class="flex flex-row h-screen">
-	<div class="flex flex-col grow min-w-0">
-		<nav class="flex flex-row justify-between items-center p-3" class:hidden={$inspectedParentAction}>
+<div class="flex flex-row h-screen max-h-screen overflow-hidden">
+	<div class="flex flex-col grow min-w-0 min-h-0">
+		<nav class="flex flex-row flex-wrap gap-y-2 justify-between items-center p-3" class:hidden={$inspectedParentAction}>
 			<div class="flex flex-col items-start space-y-1">
 				<DeviceSelector bind:devices bind:value={selectedDevice} bind:selectedProfiles bind:this={$deviceSelector} />
 				{#key selectedDevice}
@@ -38,6 +38,14 @@
 			</div>
 
 			<div class="flex flex-row items-center space-x-2" class:mr-4={Object.keys(devices).length > 0}>
+				<button
+					class="px-3 py-1 text-sm text-neutral-300 border border-neutral-600 rounded-lg transition-colors"
+					class:bg-neutral-700={!$halfSize}
+					class:bg-blue-600={$halfSize}
+					on:click={() => halfSize.update((v) => !v)}
+				>
+					50%
+				</button>
 				<PluginManager />
 				<SettingsView />
 			</div>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let windowWidth = 1100;
+	$: uiScale = Math.min(1, Math.max(0.5, windowWidth / 1100));
 	import type { Action } from "$lib/Action";
 
 	import MagnifyingGlass from "phosphor-svelte/lib/MagnifyingGlass";
@@ -76,7 +78,10 @@
 	}
 </script>
 
-<div class="flex flex-col w-[18rem] h-full bg-neutral-900 border-l border-neutral-700">
+<svelte:window bind:innerWidth={windowWidth} />
+
+<div class="flex flex-col shrink-0 h-full bg-neutral-900 border-l border-neutral-700 overflow-hidden" style={`width: ${288 * uiScale}px;`}>
+	<div class="flex flex-col h-full w-full" style={`zoom: ${uiScale};`}>
 	<div class="flex flex-row items-center m-2 bg-neutral-700 border border-neutral-600 rounded-lg">
 		<MagnifyingGlass size="13" class="ml-2 mr-1 text-neutral-300" />
 		<input bind:value={query} class="w-full p-1 text-sm text-neutral-300" placeholder={$t("action_list.search_placeholder")} type="search" spellcheck="false" />
@@ -132,5 +137,6 @@
 				</div>
 			</details>
 		{/each}
+	</div>
 	</div>
 </div>
